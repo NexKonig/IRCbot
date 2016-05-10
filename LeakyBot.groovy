@@ -75,8 +75,8 @@ public class MyBot extends PircBot {
         sendMessage channel, madlib()
     }else if(message =~ /(?i)^&help/){
         sendMessage channel, help()
-    }else if(message =~ /(?i)crap/){
-        sendMessage channel, "@sed $sender s/crap/carp"
+    // }else if(sender == "enricopulatzo" message =~ /(?i)crap/){
+    //     sendMessage channel, "@sed $sender s/crap/carp"
     }else if(message =~ /(?i)^oprah/){
         if(message =~ /(?i:^oprah)\s(.+)/){
           def item = message =~ /(?i:^oprah)\s(.+)/
