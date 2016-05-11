@@ -281,7 +281,7 @@ public class MyBot extends PircBot {
   }
 
   def dbSetup(){
-    connPool = JdbcConnectionPool.create("jdbc:h2:~/LeakyBotDB", "idam", "aPw")
+    connPool = JdbcConnectionPool.create("jdbc:h2:~/cris/IRCbot/LeakyBotDB", "idam", "aPw")
     conn = connPool.getConnection()
     Statement stat = conn.createStatement()
     stat.execute("CREATE TABLE IF NOT EXISTS INVENTORY(USER VARCHAR(255), ITEM VARCHAR(255));")
