@@ -73,13 +73,16 @@ public class MyBot extends PircBot {
       }
     }else if(message =~ /(?i)^madlib$/){
         sendMessage channel, madlib()
+
     }else if(message =~ /(?i)^&help/){
         sendMessage channel, help()
+
     }else if(message =~ /(?i)\bcrap\b/){
-      def chance = new Random().nextInt(10)
-      if(chance >= 7){
+      def chance = new Random().nextInt(20)
+      if(chance >= 16){
         sendMessage channel, "@sed $sender s/crap/carp"}
         else{println "No crapping this time"}
+
     }else if(message =~ /(?i)^oprah/){
         if(message =~ /(?i:^oprah)\s(.+)/){
           def item = message =~ /(?i:^oprah)\s(.+)/
