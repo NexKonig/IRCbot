@@ -35,8 +35,6 @@ public class MyBot extends PircBot {
       }else{
         sendMessage channel, userInv(sender, "self")
       }
-    }else if(message =~ /(?i)weekday/){
-        sendMessage channel, weekday()
     }else if(message =~ /(?i)^tossrando/){
       if(message =~ /(?i:tossrando)\s([^\s]+)/){
         def targetUsr = message =~ /(?i:tossrando)\s([^\s]+)/
@@ -93,8 +91,8 @@ public class MyBot extends PircBot {
     }
   }
 
-  //@sed nick s/wordtoreplace/replacewith
 
+//Produces a gif that plays in reverse of the gif you submit
   def revGif(String gifUrl, String ext){
     println "http://ezgif.com/reverse?url=$gifUrl.$ext"
     Document doc = Jsoup.connect("http://ezgif.com/reverse?url=$gifUrl.$ext").get()
@@ -116,27 +114,34 @@ public class MyBot extends PircBot {
     return wordGen("noun")+" "+wordGen("verb")+" "+wordGen("adjective")+" "+wordGen("noun")+", might be a good title for this gif: http://" + imgName[0][1]
   }
 
+//Steals from the rich and gives to the poor
   def robinHood(String user, String robber){
-    if(new Random().nextInt(8) > new Random().nextInt(10)){
+    def victimRoll = rsReturn("SELECT COUNT(USER) FROM INVENTORY WHERE USER='$user';")
+    println "User:$user has $victimRoll items"
+    def robberRoll = rsReturn("SELECT COUNT(USER) FROM INVENTORY WHERE USER='$robber';")
+    println "User:$robber has $robberRoll items"
+    if((new Random().nextInt(20)+victimRoll) < (new Random().nextInt(15)+robberRoll)){
       ResultSet rs = rsReturn("SELECT ITEM FROM INVENTORY WHERE USER='$user' ORDER BY RAND() LIMIT 1;")
       if(rs.isBeforeFirst()){
         rs.next()
         def item = rs.getString("ITEM")
         execOrder("DELETE TOP 1 FROM INVENTORY WHERE USER='$user' AND ITEM='$item';")
         execOrder("INSERT INTO INVENTORY (USER, ITEM) VALUES('$robber','$item');")
-        return "$robber has sneakily sneaked $item from $user...*sniff sniff* is that payback I smell in the air?"
+        return "$robber($robberRoll) has sneakily sneaked $item from $user($victimRoll)...*sniff sniff* is that payback I smell in the air?"
       }else{
         return "They've nothing to their name. Robbing the poor? Not very Robin Hood-like of you! Suffer justice!! " + tossRando(robber,"give",user)
       }
     }else{
-      def fail = ["$user saw you coming a mile away...s/saw/smelled... No item for you!",
+      def fail = ["$user($victimRoll) saw you($robberRoll) coming a mile away...s/saw/smelled... No item for you!",
                "You 1d20 a 1, grats, your pickpocket skills are so bad your hands fall off. #mercilessGM",
                "Tsk tsk, this is no way to make friends",
-               "$user saw a box creeping up next to him. $user sets the box on fire. The box then emits a faint cry for...snakes? ",]
-      return "You were caught! "+fail[new Random().nextInt(fail.size)]
+               "$user($victimRoll) saw a box creeping up next to him. $user sets the box on fire. The box then emits a faint cry for...snakes($robberRoll)? ",]
+      return "You($robberRoll) were caught by $user($victimRoll)! "+fail[new Random().nextInt(fail.size)]
     }
   }
 
+
+//You get a thingy, he gets a thingy, everyone gets a thingy!
   def oprah(String channel, String item){
     def users = getUsers(channel)
     users.each{ user->
@@ -155,10 +160,9 @@ public class MyBot extends PircBot {
                    "And on the conclusion of this joyous occasion $sender has bestowed upon $receiver $item"]
     return praises[new Random().nextInt(praises.size)]
   }
-
+//List all of Leakybot's functions
   def help(){
-    def botCommands = ["weekday",
-                    "inv [someone]",
+    def botCommands = ["inv [someone]",
                     "tossrando [someone]",
                     "gift (someone) (something or maditem)",
                     "madlib",
@@ -168,6 +172,8 @@ public class MyBot extends PircBot {
     return "My abilities are: "+botCommands.join('. ')
   }
 
+
+//Check user's inventory
   def userInv(String user, String source){
     ResultSet rs = rsReturn("SELECT ITEM FROM INVENTORY WHERE USER='$user';")
     if(source.equalsIgnoreCase("self")){
@@ -196,7 +202,7 @@ public class MyBot extends PircBot {
       }
     }
   }
-
+//Toss a random inv item away or to person
   def tossRando(String source, String action, String target){
     ResultSet rs = rsReturn("SELECT ITEM FROM INVENTORY WHERE USER='$source' ORDER BY RAND() LIMIT 1;")
     if(!rs.isBeforeFirst()){
@@ -222,34 +228,35 @@ public class MyBot extends PircBot {
       }
     }
   }
+//Just said some hard coded thing about the day of the week...it's lame :/
+  // def weekday() {
+  //     def day = new java.util.Date().getDay()
+  //     switch(day) {
+  //         case 0:
+  //             return "No, stop! Go away!!! It's Sunday, why do you do this? Leave me be!"
+  //         break
+  //         case 1:
+  //             return "T.T ugh, nnnooooo....uuuuggghhhhhh *sigh* Mondays: the most hellish of all humps"
+  //         break
+  //         case 2:
+  //             return "Tuesdays never seem close enough to Fridays"
+  //         break
+  //         case 3:
+  //             return "Woo week's half done...still have half left...a pessimistic example of half empty being good, and half full being bad"
+  //         break
+  //         case 4:
+  //             return "Ah Thursday, a day that will always live in the shadow of the mighty Friday"
+  //         break
+  //         case 5:
+  //             return "Hello Friday my old friend"
+  //         break
+  //         case 6:
+  //             return "No workie! Make with the weekending"
+  //         break
+  //     }
+  // }
 
-  def weekday() {
-      def day = new java.util.Date().getDay()
-      switch(day) {
-          case 0:
-              return "No, stop! Go away!!! It's Sunday, why do you do this? Leave me be!"
-          break
-          case 1:
-              return "T.T ugh, nnnooooo....uuuuggghhhhhh *sigh* Mondays: the most hellish of all humps"
-          break
-          case 2:
-              return "Tuesdays never seem close enough to Fridays"
-          break
-          case 3:
-              return "Woo week's half done...still have half left...a pessimistic example of half empty being good, and half full being bad"
-          break
-          case 4:
-              return "Ah Thursday, a day that will always live in the shadow of the mighty Friday"
-          break
-          case 5:
-              return "Hello Friday my old friend"
-          break
-          case 6:
-              return "No workie! Make with the weekending"
-          break
-      }
-  }
-
+//Generates a word given a word type: adj, verb, noun, etc.
   def wordGen(String wordType){
     def endpoint = "http://api.wordnik.com:80/v4/words.json/randomWords?"
     def params = [includePartOfSpeech: "$wordType",
@@ -266,7 +273,7 @@ public class MyBot extends PircBot {
     def words = json.word
     return words[new Random().nextInt(words.size)]
   }
-
+//Comes up with a random sentence
   def madlib(){
     def noun = wordGen("noun")
     def noun2 = wordGen("noun")
@@ -282,7 +289,7 @@ public class MyBot extends PircBot {
                    "Ahhhh, $adj $noun, the best way to $verb yet another $adj2 $noun2 while $verb2"]
     return phrases[new Random().nextInt(phrases.size)]
   }
-
+//Setting up DB and or connection
   def dbSetup(){
     connPool = JdbcConnectionPool.create("jdbc:h2:~/cris/IRCbot/LeakyBotDB", "idam", "aPw")
     conn = connPool.getConnection()
